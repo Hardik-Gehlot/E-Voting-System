@@ -1,23 +1,28 @@
-import logo from './logo.svg';
 import './App.css';
+import {useState} from 'react';
+import Header from './components/Header';
+import { connectWeb3Metamask } from './web3-functions';
+import Section from './components/Section';
 
 function App() {
+  const [contractInstance, setContract] = useState(null);
+  const [accounts, setAccounts] = useState(null);
+
+  async function connect() {
+    try {
+      let {accounts, instance} = await connectWeb3Metamask();
+      setAccounts(accounts);
+      setContract(instance);
+    }catch(error){
+      alert('Failed to load contract');
+      console.log(error);
+    }
+  }
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header account={accounts} connect={connect}></Header>
+      {contractInstance==null?"":
+      <Section contractInstance={contractInstance} accounts={accounts}></Section>}
     </div>
   );
 }

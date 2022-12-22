@@ -50,11 +50,10 @@ contract Voting {
         // lastWinners.push(lw);
     }
     function isAdmin() public view returns(bool){
-        bool res = false;
         if(msg.sender==owner){
-            res = true;
+            return true;
         }
-        return res;
+        return false;
     }
     function getVotingCount() public view returns(uint256){
         return votingCount;

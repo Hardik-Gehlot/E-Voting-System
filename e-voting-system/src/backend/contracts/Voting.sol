@@ -33,6 +33,28 @@ contract Voting {
         owner = msg.sender;
         status = false;
         votingCount =0;
+
+        //delete following lines
+        // votingCount=2;
+        // Candidate memory c;
+        // c.name = "Hardik Gehlot";
+        // c.party = "Bhartiya Janta Party";
+        // c.numberOfVotes = 10;
+        // c.candidateAddress = 0xC7E748a7b9ef9238aCdC89FD2912100ae517BcA0;
+        // requestedCandidate.push(c);
+        // candidates[c.candidateAddress] = c;
+        // candidateArray.push(c.candidateAddress);
+        // LastWinner memory lw;
+        // lw.candidate = c;
+        // lw.title = "PM 2020";
+        // lastWinners.push(lw);
+    }
+    function isAdmin() public view returns(bool){
+        bool res = false;
+        if(msg.sender==owner){
+            res = true;
+        }
+        return res;
     }
     function getVotingCount() public view returns(uint256){
         return votingCount;
@@ -40,9 +62,13 @@ contract Voting {
     function getStatus() public view returns(bool){
         return status;
     }
-    function getLastWinner() public view returns(LastWinner[] memory){
+    function getLastWinners() public view returns(LastWinner[] memory){
         require(votingCount>0,"There is no last Winner");
         return lastWinners;
+    }
+    function getLastWinner() public view returns(LastWinner memory){
+        require(votingCount>0,"There is no last Winner");
+        return lastWinners[lastWinners.length -1];
     }
     function startVoting(string memory _title) public{
         require(msg.sender==owner,"This action can only be performed by Owner");
@@ -102,13 +128,14 @@ contract Voting {
         v.voterAddress = msg.sender;
         v.isVoted = true;
         voters[msg.sender] = v;
-        if(++candidates[_candidate].numberOfVotes > maxVote){
+        if(candidates[_candidate].numberOfVotes++ >= maxVote){
             leadingCandidate = _candidate;
-            maxVote++;
+            maxVote = candidates[_candidate].numberOfVotes;
         }
     }
     function registerForCandidate(string memory _name,string memory _party) public{
         require(!status,"You can't register now.");
+        require(msg.sender != owner,"Owner cannot be registered");
         Candidate memory c;
         c.name = _name;
         c.party = _party;
